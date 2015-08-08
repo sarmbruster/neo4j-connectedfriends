@@ -40,12 +40,12 @@ public class Benchmarks {
     @Setup
     public void setup() throws IOException {
 //        System.out.println("setup");
-        folder = new File("/home/stefan/tmp/graph.db");
+        folder = new File("/tmp/graph.db");
         boolean isFresh = folder.exists();
         graphDatabaseService = new GraphDatabaseFactory()
                 .newEmbeddedDatabaseBuilder(folder.getAbsolutePath())
                 .setConfig(GraphDatabaseSettings.keep_logical_logs, "false")
-                .setConfig(GraphDatabaseSettings.pagecache_memory, "4g")
+//                .setConfig(GraphDatabaseSettings.pagecache_memory, "4g")
                 .newGraphDatabase();
                 //.newImpermanentDatabase();
         friendPathFinder = new FriendPathFinder();
