@@ -4,15 +4,6 @@ import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.neo4j.extension.spock.Neo4jResource
 import org.neo4j.extension.spock.Neo4jUtils
-import org.openjdk.jmh.annotations.Benchmark
-import org.openjdk.jmh.annotations.BenchmarkMode
-import org.openjdk.jmh.annotations.Fork
-import org.openjdk.jmh.annotations.Measurement
-import org.openjdk.jmh.annotations.Mode
-import org.openjdk.jmh.annotations.OutputTimeUnit
-import org.openjdk.jmh.annotations.Warmup
-
-import java.util.concurrent.TimeUnit
 
 import static spock.util.matcher.HamcrestMatchers.closeTo
 
@@ -70,7 +61,7 @@ class FriendPathFinderSpec extends Specification {
     def "check if two people are connected"() {
         when:
         def rnd = new Random()
-        def path = cut.findPathWithMaxDepth(
+        def path = cut.findPathWithMaxDepthViaSimplePaths(
                 rnd.nextInt(numberOfPeople), rnd.nextInt(numberOfPeople), maxDepth
         )
 

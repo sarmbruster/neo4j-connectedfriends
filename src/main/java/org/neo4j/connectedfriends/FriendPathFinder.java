@@ -15,7 +15,7 @@ import static org.neo4j.connectedfriends.RelationshipTypes.*;
  */
 public class FriendPathFinder {
 
-//    @Context
+    //    @Context
     public GraphDatabaseService graphDatabaseService;
 
     protected List<Node> nodes;
@@ -27,34 +27,50 @@ public class FriendPathFinder {
     public void createSampleGraph(int numberOfPeople, int avgFriends, double stdDev) {
         Random rnd = new Random();
 
+        System.out.println("starting populating graph");
         nodes = new ArrayList<>(numberOfPeople);
-        for (int i = 0; i < numberOfPeople; i++) {
-            try (Transaction tx = graphDatabaseService.beginTx()) {
+
+        try (Transaction tx = graphDatabaseService.beginTx()) {
+            for (int i = 0; i < numberOfPeople; i++) {
                 Node node = graphDatabaseService.createNode(Person);
-                node.setProperty("id", i);
+//                node.setProperty("id", i);
                 nodes.add(node);
-                tx.success();
             }
+            tx.success();
         }
+
+        Transaction tx = graphDatabaseService.beginTx();
+        int txCount = 0;
 
         for (int i = 0; i < numberOfPeople; i++) {
             long numberOfFriends = Math.round(avgFriends + rnd.nextGaussian() * stdDev);
 
             Node me = nodes.get(i);
-            try (Transaction tx = graphDatabaseService.beginTx()) {
-                for (int f = 0; f < numberOfFriends; f++) {
-                    Node friend = nodes.get(rnd.nextInt(numberOfPeople));
-                    me.createRelationshipTo(friend, FRIEND_OF);
+            for (int f = 0; f < numberOfFriends; f++) {
+                Node friend = nodes.get(rnd.nextInt(numberOfPeople));
+                me.createRelationshipTo(friend, FRIEND_OF);
+                txCount++;
+                if (txCount % 10000 == 0) {
+                    tx.success();
+                    tx.close();
+                    tx = graphDatabaseService.beginTx();
                 }
-                tx.success();
             }
         }
+        tx.success();
+        tx.close();
+        System.out.println("done populating graph");
     }
 
-    public Path findPathWithMaxDepth(Node person1, Node person2, int maxDepth) {
-//            Node node1 = graphDatabaseService.findNode(Person, "id", person1Id);
-//            Node node2 = graphDatabaseService.findNode(Person, "id", person2Id);
+    public Path findPathWithMaxDepthViaSimplePaths(Node person1, Node person2, int maxDepth) {
         Path path = GraphAlgoFactory.allSimplePaths(PathExpanders.forType(FRIEND_OF), maxDepth).findSinglePath(
+                person1, person2
+        );
+        return path;
+    }
+
+    public Path findPathWithMaxDepthViaShortestPath(Node person1, Node person2, int maxDepth) {
+        Path path = GraphAlgoFactory.shortestPath(PathExpanders.forType(FRIEND_OF), maxDepth).findSinglePath(
                 person1, person2
         );
         return path;

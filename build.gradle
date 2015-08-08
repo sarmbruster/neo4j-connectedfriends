@@ -38,7 +38,7 @@ targetCompatibility=JavaVersion.VERSION_1_7
 
 repositories {
     mavenCentral()
-    //maven { url "http://m2.neo4j.org/content/repositories/releases/" }
+//    maven { url "http://m2.neo4j.org/content/repositories/snapshots/" }
     maven { url "https://raw.github.com/neo4j-contrib/m2/master/releases" }
     //mavenLocal()
 }
@@ -51,6 +51,7 @@ configurations {
 }
 
 ext {
+//    neo4jVersion = "2.3-SNAPSHOT"
     neo4jVersion = "2.2.3"
     jerseyVersion = "1.18.1"
 }
